@@ -26,8 +26,8 @@ public class MemberController {
     @PostMapping("/join")
     public String createMember(MemberDto memberDto){
         Member member = memberDto.toEntity();
-        memberRepository.save(member);
-        return "";
+        Member saved = memberRepository.save(member);
+        return "redirect:/members/"+saved.getId();
     }
 
     @GetMapping("/members/{memberId}")
