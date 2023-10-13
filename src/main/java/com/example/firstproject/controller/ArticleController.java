@@ -1,11 +1,11 @@
 package com.example.firstproject.controller;
 
-import com.example.firstproject.dto.ArticleDto;
+import com.example.firstproject.dto.ArticleCreateDto;
+import com.example.firstproject.dto.ArticleUpdateDto;
 import com.example.firstproject.entity.Article;
 import com.example.firstproject.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -28,9 +27,9 @@ public class ArticleController {
     }
 
     @PostMapping("/articles/create")
-    public String createArticle(ArticleDto articleDto){
+    public String createArticle(ArticleCreateDto articleCreateDto){
         // 1. DTO를 엔티티로 변환
-        Article article =articleDto.toEntity();
+        Article article = articleCreateDto.toEntity();
         log.info(article.toString());
         // 2. 레포지토리로 엔티티를 DB에 저장
         Article saved = articleRepository.save(article);
@@ -58,4 +57,24 @@ public class ArticleController {
         return "articles/index";
     }
 
+    @GetMapping("/articles/{articleId}/edit")
+    public String showEditForm(@PathVariable Long articleId, Model model){
+        Article findArticle = articleRepository.findById(articleId).orElse(null);
+        model.addAttribute("article",findArticle);
+        return "articles/edit";
+    }
+
+    @PostMapping("/articles/update")
+    public String updateArticle(ArticleUpdateDto articleUpdateDto){
+        Article article = articleUpdateDto.toEntity();
+        Article findArticle = articleRepository.findById(article.getId()).orElse(null);
+
+        if(findArticle!=null){
+          //findArticle.setTitle(article.getTitle());
+          //findArticle.setContent(article.getContent());
+            articleRepository.save(article);
+        }
+
+        return "redirect:/articles/"+article.getId();
+    }
 }
